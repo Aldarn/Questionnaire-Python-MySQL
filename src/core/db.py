@@ -21,3 +21,9 @@ class DB(object):
 
 	def query(self):
 		pass
+
+	def close(self):
+		self.db.close()
+		self.dbHandle.close()
+
+db = DB()

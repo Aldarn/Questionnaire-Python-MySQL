@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 
 import argparse
+from src.core.db import db
 from src.core.questionnaire import Questionnaire
 
 def getCommandLineArguments():
@@ -20,6 +21,11 @@ def main():
 
 	# Start the questionnaire
 	Questionnaire().start()
+
+	# Close the db connection
+	# TODO: This should be used in a "with" statement along with connection pooling, but
+	# that's out of the scope of this test
+	db.close()
 
 if __name__ == '__main__':
 	main()
