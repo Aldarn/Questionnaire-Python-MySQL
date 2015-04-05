@@ -6,3 +6,5 @@ class PatientService(Service):
 
 	def create(self, obj):
 		pass
+
+patientService = PatientService()

@@ -6,3 +6,5 @@ class SessionService(Service):
 
 	def create(self, obj):
 		pass
+
+sessionService = SessionService()

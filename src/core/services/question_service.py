@@ -6,3 +6,5 @@ class QuestionService(Service):
 
 	def create(self, obj):
 		pass
+
+questionService = QuestionService()
