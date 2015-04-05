@@ -15,5 +15,5 @@ def getUserInput(prompt, options = None, returnType = str, inputFunction = raw_i
 	if options is not None:
 		if userInput not in options:
 			print "\nPlease choose one from the following options:\n\n%s\n" % "\n".join(options)
-			userInput = getUserInput(prompt, options)
+			userInput = getUserInput(prompt, options, returnType, inputFunction)
 	return returnType(userInput)
