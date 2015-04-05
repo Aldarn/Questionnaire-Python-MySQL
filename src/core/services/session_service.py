@@ -4,5 +4,5 @@ class SessionService(Service):
 	def __init__(self):
 		super(SessionService, self).__init__()
 
-	def save(self, obj):
+	def create(self, obj):
 		pass

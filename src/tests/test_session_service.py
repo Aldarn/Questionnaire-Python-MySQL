@@ -4,7 +4,7 @@ import unittest
 from ..core.services.session_service import SessionService
 
 class TestSessionService(unittest.TestCase):
-	def testSave(self):
+	def testCreate(self):
 		self.fail()
 
 def main():

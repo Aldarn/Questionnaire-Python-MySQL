@@ -1,14 +1,14 @@
 import abc
-from ..db import DB
+from ..db import db
 
 class Service (object):
 	__metaclass__ = abc.ABCMeta
 
 	@abc.abstractmethod
-	def save(self, obj):
+	def create(self, obj):
 		"""
-		Saves the given object in the database.
+		Creates the given object in the database.
 
-		:param obj: Object to save.
+		:param obj: Object to create.
 		"""
 		return

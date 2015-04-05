@@ -4,7 +4,7 @@ import unittest
 from ..core.services.patient_service import PatientService
 
 class TestPatientService(unittest.TestCase):
-	def testSave(self):
+	def testCreate(self):
 		self.fail()
 
 def main():

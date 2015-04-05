@@ -4,5 +4,5 @@ class AnswerService(Service):
 	def __init__(self):
 		super(AnswerService, self).__init__()
 
-	def save(self, obj):
+	def create(self, obj):
 		pass

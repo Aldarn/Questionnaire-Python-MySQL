@@ -4,7 +4,7 @@ import unittest
 from ..core.services.answer_service import AnswerService
 
 class TestAnswerService(unittest.TestCase):
-	def testSave(self):
+	def testCreate(self):
 		self.fail()
 
 def main():
