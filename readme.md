@@ -1,8 +1,12 @@
 Installation
 ============
 
-Install `Python 2.7`.
-Install `MySQL 5+`.
+The following binaries need installing:
+	* Python 2.7
+	* MySQL 5+
+	
+Along with the following additional python libraries:
+	* Faker - `pip install fake-factory`
 
 Running the Questionnaire
 =========================
