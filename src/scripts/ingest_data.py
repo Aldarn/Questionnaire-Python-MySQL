@@ -1,31 +1,34 @@
 #!/usr/bin/python2.7
 
 import csv
+
+from faker import Faker
+
 from ..core.domain.answer import Answer
-from ..core.services.answer_service import answerService
 from ..core.domain.patient import Patient
-from ..core.services.patient_service import patientService
-from ..core.domain.question import Question
-from ..core.services.question_service import questionService
 from ..core.domain.session import Session
+
+from ..core.services.answer_service import answerService
+from ..core.services.patient_service import patientService
 from ..core.services.session_service import sessionService
 
 def main(dataFile):
+	faker = Faker()
+
 	with open(dataFile, 'r') as fileHandle:
 		for entry in csv.reader(fileHandle):
 			# Create a patient entry
-			# TODO: Generate a name
-			patient = Patient()
-			patientService.save(patient)
+			patient = patientService.save(Patient(faker.name()))
 
 			# Create a session entry
-			session = Session(patient.id)
-			sessionService.save(session)
+			session = sessionService.save(Session(patient.id))
 
 			# Create the answers
 			for questionId, rawAnswer in enumerate(entry):
-				answer = Answer(questionId, session.id, True if rawAnswer is 'T' else False)
-				answerService.save(answer)
+				# TODO: Relying on the enumeration as the questionId is brittle since
+				# the auto_increment doesn't necessarily start at 1 - improve this
+				# by getting the actual id's for each question from the database
+				answerService.save(Answer(questionId + 1, session.id, rawAnswer))
 
 if __name__ == '__main__':
 	main("../../../data/trialsurvey.csv")
