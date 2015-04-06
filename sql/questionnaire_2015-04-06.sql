@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.23)
 # Database: questionnaire
-# Generation Time: 2015-04-06 19:31:32 +0000
+# Generation Time: 2015-04-06 22:25:59 +0000
 # ************************************************************
 
 
@@ -87,7 +87,7 @@ CREATE TABLE `sessions` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `patient_id` int(11) unsigned NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `eligible` bit(1) NOT NULL DEFAULT b'0',
+  `eligible` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `patient_id` (`patient_id`),
   CONSTRAINT `sessions_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`id`) ON DELETE CASCADE
