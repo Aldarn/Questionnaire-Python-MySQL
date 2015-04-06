@@ -1,5 +1,3 @@
-
-
 def getUserInput(prompt, options = None, returnType = str, inputFunction = raw_input):
 	"""
 	Prompts the user for input and returns the result.
@@ -29,6 +27,6 @@ def isEligible(answers):
 		return False
 
 	for answer in answers:
-		if answer.answer is 'T' or answer.answer is 'U':
+		if answer.answer == 'T' or answer.answer == 'U':
 			return False
 	return True
