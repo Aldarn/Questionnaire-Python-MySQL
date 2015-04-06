@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.23)
 # Database: questionnaire
-# Generation Time: 2015-04-05 22:22:56 +0000
+# Generation Time: 2015-04-06 13:04:10 +0000
 # ************************************************************
 
 
@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `answers`;
 CREATE TABLE `answers` (
   `question_id` int(11) unsigned NOT NULL,
   `session_id` int(11) unsigned NOT NULL,
-  `answer` bit(1) NOT NULL,
+  `answer` char(1) NOT NULL DEFAULT '',
   PRIMARY KEY (`question_id`,`session_id`),
   KEY `answer` (`answer`),
   KEY `session_id` (`session_id`),
@@ -63,6 +63,19 @@ CREATE TABLE `questions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+LOCK TABLES `questions` WRITE;
+/*!40000 ALTER TABLE `questions` DISABLE KEYS */;
+
+INSERT INTO `questions` (`id`, `question`)
+VALUES
+	(1,'Are you pregnant?'),
+	(2,'Do you smoke?'),
+	(3,'Do you have high blood pressure?'),
+	(4,'Have you ever had chemotherapy?'),
+	(5,'Have you previously participated in a clinical trial?');
+
+/*!40000 ALTER TABLE `questions` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table sessions
