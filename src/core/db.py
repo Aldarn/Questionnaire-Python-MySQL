@@ -5,10 +5,10 @@ class DB(object):
 	Object encapsulating the database connection and operations.
 	"""
 
-	def __init__(self):
-		self._connect()
+	def __init__(self, dbName = "questionnaire"):
+		self._connect(dbName)
 
-	def _connect(self):
+	def _connect(self, dbName):
 		"""
 		Connects to the MySQL database and creates a cursor.
 
@@ -19,18 +19,18 @@ class DB(object):
 			host = "localhost",
 			user = "root",
 			passwd = "",
-			db = "questionnaire"
+			db = dbName
 		)
-		self._dbHandle = self.db.cursor()
+		self._dbHandle = self._db.cursor()
 
-	def query(self, query):
+	def query(self, query, arguments = None):
 		"""
 		Executes the given query and returns the results.
 
 		:param query: The SQL to execute.
 		:return: :ist of column:value dictionaries.
 		"""
-		self._dbHandle.execute(query)
+		self._dbHandle.execute(query, arguments)
 		return self._dictFetchAll()
 
 	def _dictFetchAll(self):
@@ -44,6 +44,15 @@ class DB(object):
 			dict(zip([col[0] for col in desc], row))
 			for row in self._dbHandle.fetchall()
 		]
+
+	def commit(self):
+		"""
+		Commits any changes.
+		"""
+		self._dbHandle.commit()
+
+	def lastRowId(self):
+		return self._dbHandle.lastrowid
 
 	def close(self):
 		"""
