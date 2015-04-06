@@ -1,4 +1,5 @@
 from service import Service
+from ..domain.answer import Answer
 
 class AnswerService(Service):
 	def __init__(self):
@@ -10,8 +11,21 @@ class AnswerService(Service):
 
 		:param answer: Answer object to insert.
 		"""
-		self.db.query("INERT INTO answers (question_id, session_id, answer) VALUES (%s, %s, %s)",
-			(answer.questionId, answer.sessionId, answer.answer))
+		self.db.query("INSERT INTO answers (question_id, session_id, answer) VALUES (%s, %s, %s)",
+			answer.questionId, answer.sessionId, answer.answer)
 		self.db.commit()
+
+	def getSessionAnswers(self, sessionId):
+		"""
+		Gets all answers for the given session id.
+
+		:param sessionId: The session id to get the answers for.
+		:return: List of session objects.
+		"""
+		answerResults = self.db.query("SELECT * FROM answers WHERE session_id = %s", sessionId)
+		return [self._map(answerResult) for answerResult in answerResults]
+
+	def _map(self, answerResult):
+		return Answer(answerResult["question_id"], answerResult["session_id"], answerResult["answer"])
 
 answerService = AnswerService()
