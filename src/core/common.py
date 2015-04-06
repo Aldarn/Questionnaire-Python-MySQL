@@ -17,3 +17,18 @@ def getUserInput(prompt, options = None, returnType = str, inputFunction = raw_i
 			print "\nPlease choose one from the following options:\n\n%s\n" % "\n".join(options)
 			userInput = getUserInput(prompt, options, returnType, inputFunction)
 	return returnType(userInput)
+
+def isEligible(answers):
+	"""
+	Determines if the patient is eligible for trial based on the given answers.
+
+	:param answers: Answer objects to check for eligibility.
+	:return: True of eligible or false otherwise.
+	"""
+	if len(answers) < 5:
+		return False
+
+	for answer in answers:
+		if answer.answer is 'T' or answer.answer is 'U':
+			return False
+	return True

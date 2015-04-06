@@ -2,6 +2,7 @@
 
 import unittest
 from ..core.common import *
+from ..core.domain.answer import Answer
 
 class TestCommon(unittest.TestCase):
 	def testGetUserInput(self):
@@ -42,6 +43,29 @@ class TestCommon(unittest.TestCase):
 			return 'invalid'
 		else:
 			return 'y'
+
+	def testIsEligibleIsEligible(self):
+		answers = [Answer(i, i, 'F') for i in range(0, 5)]
+		# -------------------------------------------------------
+		eligible = isEligible(answers)
+		# -------------------------------------------------------
+		self.assertTrue(eligible)
+
+	def testIsEligibleNotEligible(self):
+		possibleAnswers = ['T', 'F', 'U']
+		answers = [Answer(i, i, possibleAnswers[i % len(possibleAnswers)]) for i in range(0, 5)]
+		# -------------------------------------------------------
+		eligible = isEligible(answers)
+		# -------------------------------------------------------
+		self.assertFalse(eligible)
+
+	def testIsEligibleInsufficientAnswers(self):
+		possibleAnswers = ['T', 'F', 'U']
+		answers = [Answer(i, i, possibleAnswers[i % len(possibleAnswers)]) for i in range(0, 4)]
+		# -------------------------------------------------------
+		eligible = isEligible(answers)
+		# -------------------------------------------------------
+		self.assertFalse(eligible)
 
 def main():
 	unittest.main()
