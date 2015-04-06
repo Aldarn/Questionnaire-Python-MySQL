@@ -6,12 +6,12 @@ class PatientService(Service):
 		super(PatientService, self).__init__()
 
 	def get(self, id):
-		patientResult = self.db.query("SELECT * FROM patients WHERE id = %s", id)
+		patientResult = self.db.query("SELECT * FROM patients WHERE id = %i", id)
 		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
 
 	def getAll(self):
-		patientsResult = self.db.query("SELECT * FROM patients")
-		return [Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"]) for patientResult in patientsResult]
+		patientResults = self.db.query("SELECT * FROM patients")
+		return [Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"]) for patientResult in patientResults]
 
 	def create(self, patient):
 		"""
