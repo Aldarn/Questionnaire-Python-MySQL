@@ -3,6 +3,7 @@
 import csv
 
 from faker import Faker
+from ..core.common import isEligible
 
 from ..core.domain.answer import Answer
 from ..core.domain.patient import Patient
@@ -24,11 +25,17 @@ def main(dataFile):
 			session = sessionService.save(Session(patient.id))
 
 			# Create the answers
+			answers = []
 			for questionId, rawAnswer in enumerate(entry):
 				# TODO: Relying on the enumeration as the questionId is brittle since
 				# the auto_increment doesn't necessarily start at 1 - improve this
 				# by getting the actual id's for each question from the database
-				answerService.save(Answer(questionId + 1, session.id, rawAnswer))
+				answer = Answer(questionId + 1, session.id, rawAnswer)
+				answerService.save(answer)
+				answers.append(answer)
+
+			# Save the eligibility
+			sessionService.updateEligibility(session, isEligible(answers))
 
 if __name__ == '__main__':
 	main("../../../data/trialsurvey.csv")
