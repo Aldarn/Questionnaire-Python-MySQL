@@ -9,6 +9,10 @@ class Question(DBObject):
 	def id(self):
 		return self._id
 
+	@id.setter
+	def id(self, id):
+		self._id = id
+
 	@property
 	def question(self):
 		return self._question
