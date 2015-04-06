@@ -23,11 +23,12 @@ class DB(object):
 		)
 		self._dbHandle = self._db.cursor()
 
-	def query(self, query, arguments = None):
+	def query(self, query, *arguments):
 		"""
 		Executes the given query and returns the results.
 
 		:param query: The SQL to execute.
+		:param arguments: Arguments for the query.
 		:return: :ist of column:value dictionaries.
 		"""
 		self._dbHandle.execute(query, arguments)
@@ -49,7 +50,7 @@ class DB(object):
 		"""
 		Commits any changes.
 		"""
-		self._dbHandle.commit()
+		self._db.commit()
 
 	def lastRowId(self):
 		return self._dbHandle.lastrowid
@@ -58,7 +59,7 @@ class DB(object):
 		"""
 		Closes the handle and connection.
 		"""
-		self._db.close()
 		self._dbHandle.close()
+		self._db.close()
 
 db = DB()
