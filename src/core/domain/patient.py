@@ -16,7 +16,7 @@ class Patient(DBObject):
 
 	@property
 	def name(self):
-		return self.name
+		return self._name
 
 	def __str__(self):
 		return "%s (joined %s)" % (self.name, self.joined)
