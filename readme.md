@@ -7,12 +7,20 @@ The following binaries need installing:
 	
 Along with the following additional python libraries:
 	* Faker - `pip install fake-factory`
+	* mock - `pip install mock`
 
 Running the Questionnaire
 =========================
 
-Execute the following from a command line interface when the current directory is the
-same as the one this file is in:
++ Ensure MySQL is installed and running. 
+
++ Create two databases, `questionnaire` and `questionnaire_test`.
+
++ Run the SQL file in the sql directory against both databases to create the initial table structure.
+
++ Update the `_connect` method in `src/core/db.py` to use your MySQL credentials.
+
++ Execute the following from a command line interface from the project base directory:
 
 	./launch.py
 
@@ -24,3 +32,4 @@ current directory is the same as the one this file is in:
 
 	python -m unittest discover
 
+Alternatively run `nosetests` if you have nose installed.
