@@ -5,21 +5,33 @@ import unittest
 from ..core import db
 from ..core.common import isEligible
 from ..scripts.ingest_data import main as ingestDataMain
+from ..core.services.service import Service
 from ..core.services.patient_service import patientService
 from ..core.services.session_service import sessionService
 from ..core.services.answer_service import answerService
 
 class TestIngestData(unittest.TestCase):
+	"""
+	This is an integration test of the ingest data script to ensure it runs and creates entries in the
+	database as expected.
+	"""
+
 	def setUp(self):
 		# Modify the db handle to point to the test database
-		db.db = db.DB("questionnaire_test")
-
-		# Empty the database to begin with (except questions since they're not modified)
-		db.db.query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE answers; TRUNCATE TABLE sessions; "
-			"TRUNCATE TABLE patients; SET FOREIGN_KEY_CHECKS = 1;")
+		self.oldDbHandle = db.dbInstance
+		self.dbHandle = db.DB("questionnaire_test")
+		db.dbInstance = self.dbHandle
+		Service.db = self.dbHandle
 
 	def tearDown(self):
-		db.db.close()
+		# Empty the database to discard any changes (except questions since they're not modified)
+		db.dbInstance.query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE answers; TRUNCATE TABLE sessions; "
+			"TRUNCATE TABLE patients; SET FOREIGN_KEY_CHECKS = 1")
+
+		# Close the test db handle and replace the original handles
+		self.dbHandle.close()
+		db.dbInstance = self.oldDbHandle
+		Service.db = self.oldDbHandle
 
 	def testIngestDataMain(self):
 		dataFile = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/test_data.csv")
