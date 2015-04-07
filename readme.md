@@ -2,25 +2,25 @@ Installation
 ============
 
 The following binaries need installing:
-	* Python 2.7
-	* MySQL 5+
+
+* Python 2.7
+* MySQL 5+
 	
 Along with the following additional python libraries:
-	* Faker - `pip install fake-factory`
-	* mock - `pip install mock`
+
+* Faker - `pip install fake-factory`
+* mock - `pip install mock`
 
 Running the Questionnaire
 =========================
 
-+ Ensure MySQL is installed and running. 
+1. Ensure MySQL is installed and running. 
+2. Create two databases, `questionnaire` and `questionnaire_test`.
+3. Run the SQL file in the sql directory against both databases to create the initial table structure.
+4. Update the `_connect` method in `src/core/db.py` to use your MySQL credentials.
+5. Execute the following from a command line interface from the project base directory:
 
-+ Create two databases, `questionnaire` and `questionnaire_test`.
-
-+ Run the SQL file in the sql directory against both databases to create the initial table structure.
-
-+ Update the `_connect` method in `src/core/db.py` to use your MySQL credentials.
-
-+ Execute the following from a command line interface from the project base directory:
+<!--  -->
 
 	./launch.py
 
