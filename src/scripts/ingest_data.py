@@ -4,16 +4,16 @@ import os
 import csv
 
 from faker import Faker
-from ..core.common import isEligible
+from src.core.common import isEligible
 
-from ..core.domain.answer import Answer
-from ..core.domain.patient import Patient
-from ..core.domain.session import Session
+from src.core.domain.answer import Answer
+from src.core.domain.patient import Patient
+from src.core.domain.session import Session
 
-from ..core.services.answer_service import answerService
-from ..core.services.patient_service import patientService
-from ..core.services.session_service import sessionService
-from ..core.services.question_service import questionService
+from src.core.services.answer_service import answerService
+from src.core.services.patient_service import patientService
+from src.core.services.session_service import sessionService
+from src.core.services.question_service import questionService
 
 def main(dataFile):
 	faker = Faker()
@@ -44,4 +44,4 @@ def main(dataFile):
 			sessionService.updateEligibility(session, isEligible(answers))
 
 if __name__ == '__main__':
-	main(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/trialsurvey.csv"))
+	main(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../data/trialsurveyunix.csv"))
