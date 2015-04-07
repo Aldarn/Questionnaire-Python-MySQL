@@ -42,17 +42,23 @@ class PatientService(Service):
 
 	def getEligibleCount(self):
 		"""
-		Gets the total number of currently eligible patients (as of the last time they took the questionnaire).
+		Gets the total number of currently eligible patients (as of the last time they took the questionnaire). This
+		query takes into account the fact that the patient may have taken the questionnaire several times, with the
+		latest being the result that matters.
+
+		I benchmarked this query against several other versions with this version being the most efficient on average.
+		Please refer to the notes to see the other variations.
 
 		:return: The number of eligible patients.
 		"""
 		eligibleCount = Service.db.query(
-			"SELECT COUNT(sessions.eligible) as count "
-			"FROM patients "
-			"LEFT JOIN sessions "
-			"ON sessions.patient_id = patients.id "
-			"GROUP BY patients.id "
-			"ORDER BY sessions.created DESC"
+			"SELECT COUNT(sessions1.id) AS eligibleCount "
+			"FROM sessions AS sessions1 "
+			"LEFT JOIN sessions AS sessions2 "
+			"ON sessions1.patient_id = sessions2.patient_id "
+			"AND sessions1.created < sessions2.created "
+			"WHERE sessions2.patient_id IS NULL "
+			"AND sessions1.eligible = 1"
 		)
 		return int(eligibleCount["count"])
 
