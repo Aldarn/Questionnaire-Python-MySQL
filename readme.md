@@ -20,9 +20,7 @@ Running the Questionnaire
 4. Update the `_connect` method in `src/core/db.py` to use your MySQL credentials.
 5. Execute the following from a command line interface from the project base directory:
 
-<!--  -->
-
-	./launch.py
+		./launch.py
 
 Tests
 =====

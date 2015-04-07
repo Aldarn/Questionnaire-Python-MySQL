@@ -50,49 +50,49 @@ clear winner even with SQL EXPLAIN and SQL_NO_CACHE to prevent cached results al
 Below is a list of the different queries tried that return the correct result, with their average query speed against 
 a collection of 102 sessions for reference:
 
-+ Using SUM and a LEFT JOIN trick with no WHERE clause on eligibility (`~1.5ms average`):
+1. Using SUM and a LEFT JOIN trick with no WHERE clause on eligibility (`~1.5ms average`):
 
-	SELECT SQL_NO_CACHE SUM(sessions1.eligible) AS eligibleCount 
-	FROM sessions AS sessions1 
-	LEFT JOIN sessions AS sessions2 
-	ON sessions1.patient_id = sessions2.patient_id 
-	AND sessions1.created < sessions2.created 
-	WHERE sessions2.patient_id IS NULL
+		SELECT SQL_NO_CACHE SUM(sessions1.eligible) AS eligibleCount 
+		FROM sessions AS sessions1 
+		LEFT JOIN sessions AS sessions2 
+		ON sessions1.patient_id = sessions2.patient_id 
+		AND sessions1.created < sessions2.created 
+		WHERE sessions2.patient_id IS NULL
 
-+ Using a subquery within the WHERE clause (`~1ms average`):
+2. Using a subquery within the WHERE clause (`~1ms average`):
 
-	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
-	FROM sessions sessions1
-	WHERE sessions1.eligible = 1 
-	AND sessions1.created = (
-		SELECT MAX(sessions2.created) 
-		FROM sessions sessions2 
-		WHERE sessions1.patient_id = sessions2.patient_id 
+		SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+		FROM sessions sessions1
+		WHERE sessions1.eligible = 1 
+		AND sessions1.created = (
+			SELECT MAX(sessions2.created) 
+			FROM sessions sessions2 
+			WHERE sessions1.patient_id = sessions2.patient_id 
+			AND sessions1.eligible = 1
+		)
+
+3. Using COUNT and a LEFT JOIN trick with a WHERE clause on eligibility (`~0.7ms average`):
+
+		SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+		FROM sessions AS sessions1 
+		LEFT JOIN sessions AS sessions2 
+		ON sessions1.patient_id = sessions2.patient_id 
+		AND sessions1.created < sessions2.created 
+		WHERE sessions2.patient_id IS NULL 
 		AND sessions1.eligible = 1
-	)
 
-+ Using COUNT and a LEFT JOIN trick with a WHERE clause on eligibility (`~0.7ms average`):
+4. Using a subquery within an INNER JOIN (`~1.75ms average`):
 
-	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
-	FROM sessions AS sessions1 
-	LEFT JOIN sessions AS sessions2 
-	ON sessions1.patient_id = sessions2.patient_id 
-	AND sessions1.created < sessions2.created 
-	WHERE sessions2.patient_id IS NULL 
-	AND sessions1.eligible = 1
-
-+ Using a subquery within an INNER JOIN (`~1.75ms average`):
-
-	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
-	FROM sessions sessions1 
-	INNER JOIN(
-		SELECT patient_id, MAX(created) maxCreated
-		FROM sessions
-		GROUP BY patient_id
-	) sessions2 
-	ON sessions1.patient_id = sessions2.patient_id 
-	AND sessions1.created = sessions2.maxCreated 
-	AND sessions1.eligible = 1
+		SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+		FROM sessions sessions1 
+		INNER JOIN(
+			SELECT patient_id, MAX(created) maxCreated
+			FROM sessions
+			GROUP BY patient_id
+		) sessions2 
+		ON sessions1.patient_id = sessions2.patient_id 
+		AND sessions1.created = sessions2.maxCreated 
+		AND sessions1.eligible = 1
 
 TODO List
 ---------
