@@ -41,24 +41,63 @@ Patients do not enter any kind of uniquely identifiable information e.g. an e-ma
 a patient reuses the system they could enter any name of a previous patient and assume their identity. It also means 
 patients with the same name would end up sharing session histories. 
 
+getEligibleCount Benchmarking
+-----------------------------
+
+The getEligibleCount query was a particularly interesting exercise to explore with several possible solutions and no 
+clear winner even with SQL EXPLAIN and SQL_NO_CACHE to prevent cached results altering the benchmarking. 
+
+Below is a list of the different queries tried that return the correct result, with their average query speed against 
+a collection of 102 sessions for reference:
+
++ Using SUM and a LEFT JOIN trick with no WHERE clause on eligibility (`~1.5ms average`):
+
+	SELECT SQL_NO_CACHE SUM(sessions1.eligible) AS eligibleCount 
+	FROM sessions AS sessions1 
+	LEFT JOIN sessions AS sessions2 
+	ON sessions1.patient_id = sessions2.patient_id 
+	AND sessions1.created < sessions2.created 
+	WHERE sessions2.patient_id IS NULL
+
++ Using a subquery within the WHERE clause (`~1ms average`):
+
+	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+	FROM sessions sessions1
+	WHERE sessions1.eligible = 1 
+	AND sessions1.created = (
+		SELECT MAX(sessions2.created) 
+		FROM sessions sessions2 
+		WHERE sessions1.patient_id = sessions2.patient_id 
+		AND sessions1.eligible = 1
+	)
+
++ Using COUNT and a LEFT JOIN trick with a WHERE clause on eligibility (`~0.7ms average`):
+
+	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+	FROM sessions AS sessions1 
+	LEFT JOIN sessions AS sessions2 
+	ON sessions1.patient_id = sessions2.patient_id 
+	AND sessions1.created < sessions2.created 
+	WHERE sessions2.patient_id IS NULL 
+	AND sessions1.eligible = 1
+
++ Using a subquery within an INNER JOIN (`~1.75ms average`):
+
+	SELECT SQL_NO_CACHE COUNT(sessions1.id) AS eligibleCount 
+	FROM sessions sessions1 
+	INNER JOIN(
+		SELECT patient_id, MAX(created) maxCreated
+		FROM sessions
+		GROUP BY patient_id
+	) sessions2 
+	ON sessions1.patient_id = sessions2.patient_id 
+	AND sessions1.created = sessions2.maxCreated 
+	AND sessions1.eligible = 1
+
 TODO List
 ---------
 
-* Fix eligibility count query - http://stackoverflow.com/questions/537223/mysql-control-which-row-is-returned-by-a-group-by
 * Create setup.py
-
-SELECT SUM(sessions.eligible) as count 
-FROM patients 
-LEFT JOIN sessions 
-ON sessions.patient_id = patients.id 
-ORDER BY sessions.created DESC
-
-SELECT *
-FROM (
-	SELECT id, max(version_id) as version_id 
-	FROM table 
-	GROUP BY id
-) t1
-INNER JOIN table t2 
-on t2.id=t1.id 
-and t1.version_id=t2.version_id
+* Create interactive mode
+* Create questionnaire mode
+* Create get matches query
