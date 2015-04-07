@@ -1,11 +1,14 @@
 import abc
-from ..db import db
+from ..db import dbInstance
 
 class Service (object):
 	__metaclass__ = abc.ABCMeta
 
+	# Static db instance for the convenience of child classes
+	db = dbInstance
+
 	def __init__(self):
-		self.db = db
+		pass
 
 	@abc.abstractmethod
 	def create(self, obj):

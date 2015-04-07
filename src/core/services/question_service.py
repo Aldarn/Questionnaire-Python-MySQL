@@ -12,7 +12,7 @@ class QuestionService(Service):
 		:param id: The id of the question to get.
 		:return: Loaded question object.
 		"""
-		questionResult = self.db.query("SELECT * FROM questions WHERE id = %s", id)[0]
+		questionResult = Service.db.query("SELECT * FROM questions WHERE id = %s", id)[0]
 		return Question(questionResult["question"], int(questionResult["id"]))
 
 	def getAll(self):
@@ -21,7 +21,7 @@ class QuestionService(Service):
 
 		:return: List of loaded question objects.
 		"""
-		questionResults = self.db.query("SELECT * FROM questions ORDER BY id ASC")
+		questionResults = Service.db.query("SELECT * FROM questions ORDER BY id ASC")
 		return [Question(questionResult["question"], int(questionResult["id"])) for questionResult in questionResults]
 
 	def create(self, question):
@@ -34,10 +34,10 @@ class QuestionService(Service):
 		if question.id is not None:
 			raise ValueError("Tried to create an already existent question (%s)." % question)
 
-		self.db.query("INSERT INTO questions (question) VALUES (%s)", question.question)
-		self.db.commit()
+		Service.db.query("INSERT INTO questions (question) VALUES (%s)", question.question)
+		Service.db.commit()
 
-		question.id = self.db.lastRowId()
+		question.id = Service.db.lastRowId()
 		return question
 
 questionService = QuestionService()

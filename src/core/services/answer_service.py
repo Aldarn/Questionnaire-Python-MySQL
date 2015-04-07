@@ -11,9 +11,9 @@ class AnswerService(Service):
 
 		:param answer: Answer object to insert.
 		"""
-		self.db.query("INSERT INTO answers (question_id, session_id, answer) VALUES (%s, %s, %s)",
+		Service.db.query("INSERT INTO answers (question_id, session_id, answer) VALUES (%s, %s, %s)",
 			answer.questionId, answer.sessionId, answer.answer)
-		self.db.commit()
+		Service.db.commit()
 
 	def getSessionAnswers(self, sessionId):
 		"""
@@ -22,7 +22,7 @@ class AnswerService(Service):
 		:param sessionId: The session id to get the answers for.
 		:return: List of session objects.
 		"""
-		answerResults = self.db.query("SELECT * FROM answers WHERE session_id = %s", sessionId)
+		answerResults = Service.db.query("SELECT * FROM answers WHERE session_id = %s", sessionId)
 		return [self._map(answerResult) for answerResult in answerResults]
 
 	def _map(self, answerResult):

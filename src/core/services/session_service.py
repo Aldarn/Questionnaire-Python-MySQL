@@ -12,7 +12,7 @@ class SessionService(Service):
 		:param id: The id of the session to get.
 		:return: The loaded session object.
 		"""
-		sessionResult = self.db.query("SELECT * FROM sessions WHERE id = %s", id)[0]
+		sessionResult = Service.db.query("SELECT * FROM sessions WHERE id = %s", id)[0]
 		return self._map(sessionResult)
 
 	def getPatientSessions(self, patientId):
@@ -22,7 +22,7 @@ class SessionService(Service):
 		:param patientId: The patient id to get the sessions for.
 		:return: List of session objects.
 		"""
-		sessionResults = self.db.query("SELECT * FROM sessions WHERE patient_id = %s", patientId)
+		sessionResults = Service.db.query("SELECT * FROM sessions WHERE patient_id = %s", patientId)
 		return [self._map(sessionResult) for sessionResult in sessionResults]
 
 	def create(self, session):
@@ -35,12 +35,12 @@ class SessionService(Service):
 		if session.id is not None:
 			raise ValueError("Tried to create an already existent session (%s)." % session)
 
-		self.db.query("INSERT INTO sessions (patient_id, eligible) VALUES (%s, %s)",
+		Service.db.query("INSERT INTO sessions (patient_id, eligible) VALUES (%s, %s)",
 			session.patientId, 1 if session.eligible else 0)
-		self.db.commit()
+		Service.db.commit()
 
 		# Reload the object to ensure auto rows are filled
-		return self.get(self.db.lastRowId())
+		return self.get(Service.db.lastRowId())
 
 	def updateEligibility(self, session, eligible):
 		"""
@@ -54,7 +54,7 @@ class SessionService(Service):
 			raise ValueError("Tried to update the eligibility of a session that has not been saved in the database (%s)." % session)
 
 		session.eligible = eligible
-		self.db.query("UPDATE sessions SET eligible = %s WHERE id = %s", 1 if eligible else 0, session.id)
+		Service.db.query("UPDATE sessions SET eligible = %s WHERE id = %s", 1 if eligible else 0, session.id)
 		return session
 
 	def _map(self, sessionResult):

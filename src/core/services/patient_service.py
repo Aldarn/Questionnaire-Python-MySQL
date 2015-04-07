@@ -12,7 +12,7 @@ class PatientService(Service):
 		:param id: The id of the patient object to get.
 		:return:
 		"""
-		patientResult = self.db.query("SELECT * FROM patients WHERE id = %s", id)[0]
+		patientResult = Service.db.query("SELECT * FROM patients WHERE id = %s", id)[0]
 		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
 
 	def getAll(self):
@@ -21,7 +21,7 @@ class PatientService(Service):
 
 		:return: List of patient objects.
 		"""
-		patientResults = self.db.query("SELECT * FROM patients")
+		patientResults = Service.db.query("SELECT * FROM patients")
 		return [Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"]) for patientResult in patientResults]
 
 	def create(self, patient):
@@ -34,11 +34,11 @@ class PatientService(Service):
 		if patient.id is not None:
 			raise ValueError("Tried to create an already existent patient (%s)." % patient)
 
-		self.db.query("INSERT INTO patients (name) VALUES (%s)", patient.name)
-		self.db.commit()
+		Service.db.query("INSERT INTO patients (name) VALUES (%s)", patient.name)
+		Service.db.commit()
 
 		# Reload the object to ensure auto rows are filled
-		return self.get(self.db.lastRowId())
+		return self.get(Service.db.lastRowId())
 
 	def getEligibleCount(self):
 		"""
@@ -46,7 +46,7 @@ class PatientService(Service):
 
 		:return: The number of eligible patients.
 		"""
-		eligibleCount = self.db.query(
+		eligibleCount = Service.db.query(
 			"SELECT COUNT(sessions.eligible) as count "
 			"FROM patients "
 			"LEFT JOIN sessions "
