@@ -6,9 +6,10 @@ class DB(object):
 	"""
 
 	def __init__(self, dbName = "questionnaire"):
-		self._connect(dbName)
+		self._dbName = dbName
+		self._connect()
 
-	def _connect(self, dbName):
+	def _connect(self):
 		"""
 		Connects to the MySQL database and creates a cursor.
 
@@ -19,11 +20,11 @@ class DB(object):
 			host = "localhost",
 			user = "root",
 			passwd = "",
-			db = dbName
+			db = self._dbName
 		)
 		self._dbHandle = self._db.cursor()
 
-	def query(self, query, *arguments):
+	def query(self, queryStr, *arguments):
 		"""
 		Executes the given query and returns the results.
 
@@ -31,7 +32,8 @@ class DB(object):
 		:param arguments: Arguments for the query.
 		:return: :ist of column:value dictionaries.
 		"""
-		self._dbHandle.execute(query, arguments)
+		for query in queryStr.split(";"):
+			self._dbHandle.execute(query, arguments)
 		return self._dictFetchAll()
 
 	def _dictFetchAll(self):
@@ -62,4 +64,10 @@ class DB(object):
 		self._dbHandle.close()
 		self._db.close()
 
-db = DB()
+	def __str__(self):
+		return "DB(db: %s, dbName: %s)" % (self._db, self._dbName)
+
+	def __repr__(self):
+		return "DB(%s, %s)" % (self._db, self._dbName)
+
+dbInstance = DB()
