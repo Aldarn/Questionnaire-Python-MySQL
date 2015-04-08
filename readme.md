@@ -1,3 +1,12 @@
+Introduction
+------------
+
+Please follow the instructions in this readme in order to install and run the questionnaire. Additional notes can be 
+found in the notes.md file.
+
+These files are written using Markdown; viewing them within the Bitbucket repository or another markdown parser will 
+render them in a simple wiki style format. They should however also be perfectly readable as plain text.
+
 Installation
 ============
 
@@ -8,8 +17,13 @@ The following binaries need installing:
 	
 Along with the following additional python libraries:
 
-* Faker - `pip install fake-factory`
-* mock - `pip install mock`
+* Faker 
+		
+		pip install fake-factory
+
+* mock 
+		
+		pip install mock
 
 Running the Questionnaire
 =========================
