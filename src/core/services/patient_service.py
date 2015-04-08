@@ -62,4 +62,59 @@ class PatientService(Service):
 		)
 		return int(eligibleCount["count"])
 
+
+	def getMatchingPatientsCount(self, sessionId, answers):
+		"""
+		Gets the number of patients' latest sessions that have answers matching the given list of answers.
+
+		For example:
+			- Current answers: FUF
+			- Previous sessions answers: FFFFF, FUFTF, TTTTT, UUUFT, FTF
+			- Matches: FFFFF, FUFTF, FTF
+
+		:param sessionId: The session id the given answers belong to, so we can omit it from the results.
+		:param answers: The current answers to match against.
+		:return: The number of matching patients.
+		"""
+		# Get a matching string including wildcards for the SQL query
+		# TODO: Generate this changing U's to _'s and trailing U's to a %
+		matchingString = ""
+
+		matchCount = 0
+		try:
+			# Query for matching sessions
+			matchCount = Service.db.query(
+				"SELECT COUNT(*) as matchCount "
+				"FROM ("
+				"	SELECT sessions1.id "
+				"	FROM questions "
+				"	LEFT JOIN answers "
+				"	ON answers.question_id = questions.id "
+				"	LEFT JOIN sessions AS sessions1 "
+				"	ON sessions1.id = answers.session_id "
+				"	LEFT JOIN sessions AS sessions2 "
+				"	ON sessions1.patient_id = sessions2.patient_id "
+				"	AND sessions1.created < sessions2.created "
+				"	WHERE sessions2.patient_id IS NULL "
+				"	AND answers.session_id != %s "
+				"	GROUP BY answers.session_id "
+				"	HAVING GROUP_CONCAT(answers.answer ORDER BY questions.id ASC SEPARATOR '') LIKE %s"
+				") matches",
+				sessionId, matchingString
+			)[0]["matchCount"]
+		except KeyError, ke:
+			# Key error means no results
+			pass
+		return matchCount
+
+	def getEligibleChance(self, sessionId, answers):
+		"""
+		TODO
+
+		:param sessionId:
+		:param answers:
+		:return:
+		"""
+		return int((self.getEligibleCount() / self.getMatchingPatientsCount(sessionId, answers)) * 100)
+
 patientService = PatientService()
