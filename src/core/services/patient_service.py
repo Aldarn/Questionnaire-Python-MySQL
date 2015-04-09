@@ -2,6 +2,7 @@ import re
 
 from service import Service
 from ..domain.patient import Patient
+from ..common import getUserInput
 
 class PatientService(Service):
 	def __init__(self):
@@ -15,6 +16,16 @@ class PatientService(Service):
 		:return:
 		"""
 		patientResult = Service.db.query("SELECT * FROM patients WHERE id = %s", id)[0]
+		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
+
+	def getByName(self, name):
+		"""
+		Gets a patient object from the database by the given name.
+
+		:param name: The name of the patient object to get.
+		:return:
+		"""
+		patientResult = Service.db.query("SELECT * FROM patients WHERE name = %s", name)[0]
 		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
 
 	def getAll(self):
@@ -137,6 +148,23 @@ class PatientService(Service):
 
 		# Return the chance or 1 if the chance is 0 since there is always hope (i.e. the chance was so small it was < 1
 		# or there are currently no eligible patients in the system) :)
-		return eligibleChance if eligibleChance > 0 else 1
+		return int(eligibleChance) if eligibleChance is not None and int(eligibleChance) > 0 else 1
+
+	def createOrGetFromInput(self):
+		"""
+		Asks the patient for their name and either retrieves an existing patient record if they are already registered
+		or creates a new one.
+
+		:return: The new patient object.
+		"""
+		# Get the name
+		patientName = getUserInput("What is your name?")
+
+		try:
+			# Try and find an already registered patient
+			return self.getByName(patientName)
+		except IndexError:
+			# Index error means there were no results so create a new patient entry
+			return self.create(Patient(patientName))
 
 patientService = PatientService()
