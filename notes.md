@@ -15,6 +15,8 @@ expect both when entering the data and retrieving it later on. The downside is o
 tests, setting up and tearing down the test database and the additional time taken for these tests to run.
 
 * Discuss complexity of queries
+* getEligibleCount become obsolete when getEligibleChance was modified to also return total eligible count
+* Discuss getEligibleChance, possibly paste the method description in here and also refer to the code?
 
 What I Would Change With More Time
 ----------------------------------
@@ -31,6 +33,9 @@ TODO
 * Investigate generifying the services a bit more (seems to be a fair amount of overlap)
 * E-mails or passwords for patients
 * Simplified queries, using views, etc
+* Services should actually be DAO's
+* All business logic in services (non query methods) should stay in services
+* Interfaces between services and daos for database agnostic code + same with services
 
 As mentioned in the overview of the solution, testing database methods requires a separate test database to be 
 pre-configured. This should be done a bit smarter either by using an existing library or framework to take care of it 
