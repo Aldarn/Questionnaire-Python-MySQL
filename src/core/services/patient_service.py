@@ -1,3 +1,5 @@
+import re
+
 from service import Service
 from ..domain.patient import Patient
 
@@ -62,59 +64,79 @@ class PatientService(Service):
 		)
 		return int(eligibleCount["count"])
 
-
-	def getMatchingPatientsCount(self, sessionId, answers):
+	def getEligibleChance(self, sessionId, answers):
 		"""
-		Gets the number of patients' latest sessions that have answers matching the given list of answers.
+		Calculates the eligibility chance based on the number of currently eligible patients and the number of patients'
+		latest sessions that have answers matching the given list of answers.
+
+		The matching works by grouping all answers by session and combining them into a string, thus getting one row of all
+		answers for each session. We create a similar matcher string by combining the list of answers given, replacing
+		unknown answers with wildcards representing "1 of any answer" and trailing wildcards with a suffix wildcard
+		representing "0 or more of any answer". The set of all grouped answers is then filtered by removing the current
+		session, removing sessions that are not the latest for their corresponding patients and by the matcher string.
+		This set represents all previous patients that had the same (or possibly the same when considering unknown answers)
+		answers as given in the provided session.
 
 		For example:
 			- Current answers: FUF
+			- Matcher string: F_F%
 			- Previous sessions answers: FFFFF, FUFTF, TTTTT, UUUFT, FTF
 			- Matches: FFFFF, FUFTF, FTF
 
+		The purpose of the suffix wildcard replacing the previous wildcards is to allow for partial sessions to be
+		included in the set of possible matches, for example:
+			- Matcher string without suffix wildcard: F_F__
+			- Previous session answer: FUF
+			- Result: No match since F_F___ is looking for answer strings of length 5
+
+			- Matcher string with suffix wildcard: F_F%
+			- Previous session answer: FUF
+			- Result: Match since FUF == F[any]F[0 or more of any]
+
+		Finally to calculate the eligibility chance we simply select the number of eligible patients from the matched
+		set and divide that by the total number of matched patients.
+
 		:param sessionId: The session id the given answers belong to, so we can omit it from the results.
 		:param answers: The current answers to match against.
-		:return: The number of matching patients.
+		:return: The chance this session will be eligible as a percentage.
 		"""
-		# Get a matching string including wildcards for the SQL query
-		# TODO: Generate this changing U's to _'s and trailing U's to a %
-		matchingString = ""
+		# Concatenate all answers
+		answersString = "".join([answer.answer for answer in answers])
 
-		matchCount = 0
-		try:
-			# Query for matching sessions
-			matchCount = Service.db.query(
-				"SELECT COUNT(*) as matchCount "
-				"FROM ("
-				"	SELECT sessions1.id "
-				"	FROM questions "
-				"	LEFT JOIN answers "
-				"	ON answers.question_id = questions.id "
-				"	LEFT JOIN sessions AS sessions1 "
-				"	ON sessions1.id = answers.session_id "
-				"	LEFT JOIN sessions AS sessions2 "
-				"	ON sessions1.patient_id = sessions2.patient_id "
-				"	AND sessions1.created < sessions2.created "
-				"	WHERE sessions2.patient_id IS NULL "
-				"	AND answers.session_id != %s "
-				"	GROUP BY answers.session_id "
-				"	HAVING GROUP_CONCAT(answers.answer ORDER BY questions.id ASC SEPARATOR '') LIKE %s"
-				") matches",
-				sessionId, matchingString
-			)[0]["matchCount"]
-		except KeyError, ke:
-			# Key error means no results
-			pass
-		return matchCount
+		# If they answered true to any question they are not eligible
+		if 'T' in answersString:
+			return 0
 
-	def getEligibleChance(self, sessionId, answers):
-		"""
-		TODO
+		# Get a matching string including wildcards (1 of any answer) for unknowns for the SQL query
+		answersString = answersString.replace('U', '_')
 
-		:param sessionId:
-		:param answers:
-		:return:
-		"""
-		return int((self.getEligibleCount() / self.getMatchingPatientsCount(sessionId, answers)) * 100)
+		# Remove trailing wildcards and replace with % (0 or more of any answer) to include incomplete sessions if
+		# applicable
+		answersString = re.sub(r'(^.*?[F]*)(_+)$', r'\1%', answersString)
+
+		# Run the query to calculate the eligibility chance
+		eligibleChance = Service.db.query(
+			"SELECT FLOOR((SUM(CASE WHEN matches.eligible = 1 THEN 1 ELSE 0 END) / COUNT(*)) * 100) AS eligibleChance "
+			"FROM ("
+			"	SELECT sessions1.id, sessions1.eligible "
+			"	FROM questions "
+			"	LEFT JOIN answers "
+			"	ON answers.question_id = questions.id "
+			"	LEFT JOIN sessions AS sessions1 "
+			"	ON sessions1.id = answers.session_id "
+			"	LEFT JOIN sessions AS sessions2 "
+			"	ON sessions1.patient_id = sessions2.patient_id "
+			"	AND sessions1.created < sessions2.created "
+			"	WHERE sessions2.patient_id IS NULL "
+			"	AND answers.session_id != %s "
+			"	GROUP BY answers.session_id "
+			"	HAVING GROUP_CONCAT(answers.answer ORDER BY questions.id ASC SEPARATOR '') LIKE %s"
+			") matches",
+			sessionId, answersString
+		)[0]["eligibleChance"]
+
+		# Return the chance or 1 if the chance is 0 since there is always hope (i.e. the chance was so small it was < 1
+		# or there are currently no eligible patients in the system) :)
+		return eligibleChance if eligibleChance > 0 else 1
 
 patientService = PatientService()
