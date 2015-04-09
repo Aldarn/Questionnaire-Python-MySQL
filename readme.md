@@ -13,9 +13,18 @@ Installation
 The following binaries need installing:
 
 * Python 2.7
-* MySQL 5+
+* MySQL 5.6.23 (Although 5+ should work)
+
+The project can then be installed using the setup script:
+
+	./setup.py install
 	
-Along with the following additional python libraries:
+Alternatively the project can be setup by extracting the source code somewhere convenient. The following additional 
+python libraries must then also be installed:
+
+* MySQLdb
+
+		pip install MySQL-python
 
 * Faker 
 		
@@ -24,6 +33,8 @@ Along with the following additional python libraries:
 * mock 
 		
 		pip install mock
+		
+This has only been tested on unix-like systems, your mileage may vary with Windows (or other unix distros!).
 
 Running the Questionnaire
 =========================
