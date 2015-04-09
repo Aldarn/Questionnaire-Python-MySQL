@@ -14,6 +14,8 @@ def getUserInput(prompt, options = None, returnType = str, inputFunction = raw_i
 		if userInput not in options:
 			print "\nPlease choose one from the following options:\n\n%s\n" % "\n".join(options)
 			userInput = getUserInput(prompt, options, returnType, inputFunction)
+	elif len(userInput) == 0:
+		userInput = getUserInput(prompt, options, returnType, inputFunction)
 	return returnType(userInput)
 
 def isEligible(answers):
