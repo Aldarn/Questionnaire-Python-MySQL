@@ -1,4 +1,4 @@
-from service import Service
+from service import Service, NoResultFound
 from ..domain.question import Question
 
 class QuestionService(Service):
@@ -12,8 +12,11 @@ class QuestionService(Service):
 		:param id: The id of the question to get.
 		:return: Loaded question object.
 		"""
-		questionResult = Service.db.query("SELECT * FROM questions WHERE id = %s", id)[0]
-		return Question(questionResult["question"], int(questionResult["id"]))
+		try:
+			questionResult = Service.db.query("SELECT * FROM questions WHERE id = %s", id)[0]
+			return self._map(questionResult)
+		except IndexError, e:
+			raise NoResultFound("No question was found with id %i" % id)
 
 	def getAll(self):
 		"""
@@ -22,7 +25,7 @@ class QuestionService(Service):
 		:return: List of loaded question objects.
 		"""
 		questionResults = Service.db.query("SELECT * FROM questions ORDER BY id ASC")
-		return [Question(questionResult["question"], int(questionResult["id"])) for questionResult in questionResults]
+		return [self._map(questionResult) for questionResult in questionResults]
 
 	def create(self, question):
 		"""
@@ -39,5 +42,8 @@ class QuestionService(Service):
 
 		question.id = Service.db.lastRowId()
 		return question
+
+	def _map(self, questionResult):
+		return Question(questionResult["question"], int(questionResult["id"]))
 
 questionService = QuestionService()
