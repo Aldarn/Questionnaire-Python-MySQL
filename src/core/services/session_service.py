@@ -58,6 +58,8 @@ class SessionService(Service):
 
 		session.eligible = eligible
 		Service.db.query("UPDATE sessions SET eligible = %s WHERE id = %s", 1 if eligible else 0, session.id)
+		Service.db.commit()
+
 		return session
 
 	def _map(self, sessionResult):
