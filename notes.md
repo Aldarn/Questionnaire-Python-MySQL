@@ -48,6 +48,11 @@ were ignored completely. As such my final solution was to simply ignore the unkn
 definitely eligible sessions divided by the total number of matching sessions as previously described. This can be seen 
 with a more granular description in the `getEligibleChance` method.
 
+* Also considered attempting to determine unknown values based on answers to other questions e.g. non-smokers less 
+likely to have high blood pressure; possibility of asking additional questions to determine an unknown answer; looking 
+at the patients session history and if their last session (or more?) was eligible then they are more likely to be 
+eligible again?
+
 I decided to record the unanswered questions (`U's`) in the database as well as the yesses (`T's`) and nos (`F's`). It 
 could be argued that unanswered questions could simply have omitted rows in the answers table thus saving some disk 
 space. I opted against this for ease of querying and completion of the data set, although i'm not sure it matters much 
@@ -170,3 +175,4 @@ TODO List
 
 * Test setup.py
 * Test questionnaire mode
+* Test initial eligibility chance is correct
