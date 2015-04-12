@@ -16,8 +16,10 @@ class Questionnaire(object):
 		"""
 		Runs the questionnaire.
 		"""
-		print "Welcome to the questionnaire! Please answer all questions honestly; if you do not know any answers then " \
-			  "please skip the question. Good luck!\n"
+		print "Welcome to the questionnaire!\n" \
+			  "There are currently %i eligible patients for this trial.\n" \
+			  "Please answer all questions honestly; if you do not know any answers then " \
+			  "please skip the question. Good luck!\n" % patientService.getEligibleCount()
 
 		# Get the patient
 		patient = patientService.createOrGetFromInput()
