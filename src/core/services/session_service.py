@@ -1,4 +1,4 @@
-from service import Service
+from service import Service, NoResultFound
 from ..domain.session import Session
 
 class SessionService(Service):
@@ -12,8 +12,11 @@ class SessionService(Service):
 		:param id: The id of the session to get.
 		:return: The loaded session object.
 		"""
-		sessionResult = Service.db.query("SELECT * FROM sessions WHERE id = %s", id)[0]
-		return self._map(sessionResult)
+		try:
+			sessionResult = Service.db.query("SELECT * FROM sessions WHERE id = %s", id)[0]
+			return self._map(sessionResult)
+		except IndexError, e:
+			raise NoResultFound("No session was found with id %i" % id)
 
 	def getPatientSessions(self, patientId):
 		"""
