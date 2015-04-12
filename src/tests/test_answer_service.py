@@ -2,6 +2,7 @@
 
 import unittest
 import mock
+
 from ..core.domain.answer import Answer
 from ..core.services.answer_service import answerService
 

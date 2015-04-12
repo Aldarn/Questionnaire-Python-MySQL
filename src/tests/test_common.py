@@ -3,8 +3,6 @@
 import unittest
 import common
 from ..core.common import *
-from ..core.domain.answer import Answer
-from ..core.services.answer_service import AnswerService
 
 class TestCommon(unittest.TestCase):
 	def testGetUserInput(self):
