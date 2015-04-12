@@ -1,6 +1,6 @@
 import re
 
-from service import Service
+from service import Service, NoResultFound
 from ..domain.patient import Patient
 from ..common import getUserInput
 
@@ -15,8 +15,11 @@ class PatientService(Service):
 		:param id: The id of the patient object to get.
 		:return:
 		"""
-		patientResult = Service.db.query("SELECT * FROM patients WHERE id = %s", id)[0]
-		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
+		try:
+			patientResult = Service.db.query("SELECT * FROM patients WHERE id = %s", id)[0]
+			return self._map(patientResult)
+		except IndexError, e:
+			raise NoResultFound("No patient was found with id %i" % id)
 
 	def getByName(self, name):
 		"""
@@ -25,8 +28,11 @@ class PatientService(Service):
 		:param name: The name of the patient object to get.
 		:return:
 		"""
-		patientResult = Service.db.query("SELECT * FROM patients WHERE name = %s", name)[0]
-		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
+		try:
+			patientResult = Service.db.query("SELECT * FROM patients WHERE name = %s", name)[0]
+			return self._map(patientResult)
+		except IndexError, e:
+			raise NoResultFound("No patient was found with name %s" % name)
 
 	def getAll(self):
 		"""
@@ -35,7 +41,7 @@ class PatientService(Service):
 		:return: List of patient objects.
 		"""
 		patientResults = Service.db.query("SELECT * FROM patients")
-		return [Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"]) for patientResult in patientResults]
+		return [self._map(patientResult) for patientResult in patientResults]
 
 	def create(self, patient):
 		"""
@@ -158,13 +164,16 @@ class PatientService(Service):
 		:return: The new patient object.
 		"""
 		# Get the name
-		patientName = getUserInput("What is your name?")
+		patientName = getUserInput("What is your name? ")
 
 		try:
 			# Try and find an already registered patient
 			return self.getByName(patientName)
-		except IndexError:
-			# Index error means there were no results so create a new patient entry
+		except NoResultFound:
+			# This patient doesn't exist so create a new one
 			return self.create(Patient(patientName))
+
+	def _map(self, patientResult):
+		return Patient(patientResult["name"], int(patientResult["id"]), patientResult["joined"])
 
 patientService = PatientService()
