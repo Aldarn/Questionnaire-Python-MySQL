@@ -18,3 +18,15 @@ class Service (object):
 		:param obj: Object to create.
 		"""
 		return
+
+	@abc.abstractmethod
+	def _map(self, databaseResult):
+		"""
+		Maps the given database result to an instance of an object.
+
+		:param databaseResult: The result of a database query
+		"""
+		return
+
+class NoResultFound(Exception):
+	pass
