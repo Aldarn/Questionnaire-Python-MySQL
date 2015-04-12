@@ -4,6 +4,7 @@ import unittest
 import common
 from ..core.common import *
 from ..core.domain.answer import Answer
+from ..core.services.answer_service import AnswerService
 
 class TestCommon(unittest.TestCase):
 	def testGetUserInput(self):
@@ -32,7 +33,7 @@ class TestCommon(unittest.TestCase):
 
 	def _getUserInputWithOptionsTest(self, inputFunction):
 		prompt = "yes or no?"
-		options = ['y', 'n', 's']
+		options = {'y', 'n', 's'}
 		# -------------------------------------------------------
 		result = getUserInput(prompt, options = options, inputFunction = inputFunction)
 		# -------------------------------------------------------
@@ -58,10 +59,8 @@ class TestCommon(unittest.TestCase):
 		self.assertFalse(eligible)
 
 	def testIsEligibleInsufficientAnswers(self):
-		possibleAnswers = ['T', 'F', 'U']
-		answers = [Answer(i, i, possibleAnswers[i % len(possibleAnswers)]) for i in range(0, 4)]
 		# -------------------------------------------------------
-		eligible = isEligible(answers)
+		eligible = isEligible(common.getTestAnswers(total = 4))
 		# -------------------------------------------------------
 		self.assertFalse(eligible)
 
