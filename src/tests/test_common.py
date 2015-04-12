@@ -28,7 +28,7 @@ class TestCommon(unittest.TestCase):
 		self._getUserInputWithOptionsTest(lambda s: 'y')
 
 	def testGetUserInputWithInvalidOption(self):
-		self._getUserInputWithOptionsTest(self._optionsInputFunction)
+		self._getUserInputWithOptionsTest(self._optionsInvalidInputFunction)
 
 	def _getUserInputWithOptionsTest(self, inputFunction):
 		prompt = "yes or no?"
@@ -38,12 +38,10 @@ class TestCommon(unittest.TestCase):
 		# -------------------------------------------------------
 		self.assertEqual(result, 'y')
 
-	# TODO: Test empty user input
-
-	def _optionsInputFunction(self, prompt, _hasPrompted = [False]):
-		if _hasPrompted[0]:
+	def _optionsInvalidInputFunction(self, prompt, _hasPrompted = [False]):
+		if not _hasPrompted[0]:
 			_hasPrompted[0] = True
-			return 'invalid'
+			return ""
 		else:
 			return 'y'
 
