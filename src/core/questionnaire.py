@@ -49,6 +49,10 @@ class Questionnaire(object):
 
 		print "\nThank you for finishing the questionnaire!"
 
-		print "Congratulations, you are eligible for the trial!" if isEligible(answers) else "Unfortunately you are " \
+		# Determine if they are eligible and update the session
+		eligibility = isEligible(answers)
+		sessionService.updateEligibility(session, eligibility)
+
+		print "Congratulations, you are eligible for the trial!" if eligibility else "Unfortunately you are " \
 		 	"not eligible for this clinical trial; if your circumstances chance please revisit us. We wish you the best" \
 			"of health :)"
