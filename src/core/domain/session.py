@@ -1,8 +1,8 @@
 from db_object import DBObject
 
 class Session(DBObject):
-	def __init__(self, patient_id, id = None, created = None, eligible = False):
-		self._patientId = patient_id
+	def __init__(self, patientId, id = None, created = None, eligible = False):
+		self._patientId = patientId
 		self._id = id
 		self._created = created
 		self._eligible = eligible
