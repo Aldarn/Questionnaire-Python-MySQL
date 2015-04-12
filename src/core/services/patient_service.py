@@ -123,7 +123,7 @@ class PatientService(Service):
 
 		# Remove trailing wildcards and replace with % (0 or more of any answer) to include incomplete sessions if
 		# applicable
-		answersString = re.sub(r'(^.*?[F]*)(_+)$', r'\1%', answersString)
+		answersString = re.sub(r'(^.*?[F]*)(_*)$', r'\1%', answersString)
 
 		# Run the query to calculate the eligibility chance
 		eligibleChance = Service.db.query(
