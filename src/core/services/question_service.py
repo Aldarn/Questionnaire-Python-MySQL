@@ -40,8 +40,7 @@ class QuestionService(Service):
 		Service.db.query("INSERT INTO questions (question) VALUES (%s)", question.question)
 		Service.db.commit()
 
-		question.id = Service.db.lastRowId()
-		return question
+		return self.get(Service.db.lastRowId())
 
 	def _map(self, questionResult):
 		return Question(questionResult["question"], int(questionResult["id"]))
