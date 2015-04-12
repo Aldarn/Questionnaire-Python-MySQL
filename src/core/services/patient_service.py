@@ -73,7 +73,7 @@ class PatientService(Service):
 			"WHERE sessions2.patient_id IS NULL "
 			"AND sessions1.eligible = 1"
 		)
-		return int(eligibleCount["count"])
+		return int(eligibleCount[0]["eligibleCount"])
 
 	def getEligibleChance(self, sessionId, answers):
 		"""
