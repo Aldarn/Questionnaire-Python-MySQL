@@ -39,11 +39,10 @@ class Questionnaire(object):
 		for question in questions:
 			print "\nYour current eligibility chance is %i%%\n" % patientService.getEligibleChance(session.id, answers)
 
-			# TODO: Encapsulate this in the question service, use user friendly names and map the results
-			answer = getUserInput("%s " % question.question, ["T", "F", "U"]).upper()
+			answer = getUserInput("%s " % question.question, answerService.getFriendlyAnswers()).upper()
 
 			# Save the answer
-			answer = Answer(question.id, session.id, answer)
+			answer = Answer(question.id, session.id, answerService.getAnswerFromFriendly(answer))
 			answerService.create(answer)
 			answers.append(answer)
 
