@@ -8,10 +8,11 @@ def getUserInput(prompt, options = None, returnType = str, inputFunction = raw_i
 	:param inputFunction: The function to use to receive the user input, defaults to raw_input.
 	:return: The result casted to the given return type.
 	"""
-	optionString = " (%s)" % ", ".join(options) if options is not None else ""
+	optionString = "(%s) " % ", ".join(options) if options is not None else ""
 	userInput = inputFunction("%s%s" % (prompt, optionString))
 	if options is not None:
-		if userInput not in options:
+		# Force both to upper case for case insensitive matching
+		if userInput.upper() not in map(str.upper, options):
 			print "\nPlease choose one from the following options:\n\n%s\n" % "\n".join(options)
 			userInput = getUserInput(prompt, options, returnType, inputFunction)
 	elif len(userInput) == 0:
