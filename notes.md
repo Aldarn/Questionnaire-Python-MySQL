@@ -17,7 +17,7 @@ From experience I have found service oriented architecture tends to lead to fair
 coupling and separation of concerns whilst also being simple to reason about. This makes decisions such as where to put 
 specific pieces of functionality clearer for the programmer, tests are generally simpler to implement as the code is 
 by nature more modular and if done correctly it should also be simple to completely change a services behaviour without 
-affecting the underlying functionality that relies on the service. 
+affecting the underlying functionality that relies on the service.
 
 The use of MySQL is debatable for this task; it would have been entirely feasible to simply use the data file as a 
 single source of data by loading it into memory, performing calculations and writing fresh answers back to the file. 
@@ -48,15 +48,16 @@ were ignored completely. As such my final solution was to simply ignore the unkn
 definitely eligible sessions divided by the total number of matching sessions as previously described. This can be seen 
 with a more granular description in the `getEligibleChance` method.
 
-* Also considered attempting to determine unknown values based on answers to other questions e.g. non-smokers less 
-likely to have high blood pressure; possibility of asking additional questions to determine an unknown answer; looking 
-at the patients session history and if their last session (or more?) was eligible then they are more likely to be 
-eligible again?
+Additionally I also considered attempting to determine unknown values based on answers to other questions e.g. non-smokers 
+are less likely to have high blood pressure. Even simpler would have been to ask additional questions that could be used 
+to determine the original answer. It's also possible that by using a patients session history the eligibility chance 
+could be modified if their last session (or more?) was eligible, as they then maybe more likely to be eligible again. I 
+decided that these approaches were probably out of the scope of the test.
 
-I decided to record the unanswered questions (`U's`) in the database as well as the yesses (`T's`) and nos (`F's`). It 
-could be argued that unanswered questions could simply have omitted rows in the answers table thus saving some disk 
-space. I opted against this for ease of querying and completion of the data set, although i'm not sure it matters much 
-either way.
+When recording the answers I chose to store the unanswered questions (`U's`) in the database as well as the yesses (`T's`) 
+and nos (`F's`). It could be argued that unanswered questions could simply have omitted rows in the answers table thus 
+saving some disk space. I opted against this for ease of querying and completion of the data set, although i'm not sure 
+it matters much either way.
 
 Some of the queries used in the solution are quite complex, in particular `getEligibleChance` which entirely computes the 
 eligibility chance percentage within SQL. An easier solution would have been a simple query to gather the required data 
@@ -67,7 +68,7 @@ these kinds of operations, and secondly it should also scale much more efficient
 admittedly this isn't likely to be a problem for this task). I did perform some more exhaustive performance testing on 
 the `getEligibleCount` query, although it transpired this method is mostly obsolete after I realised I could get the 
 number of eligible patients at no extra cost as part of the `getEligibleChance` query, which was originally just 
-obtaining the number of matching sessions. 
+obtaining the number of matching sessions.
 
 With regards to testing, I attempted to hit most core functionality with exhaustive unit tests. In some cases, such as 
 the ingest data script test, I also decided to use integration tests. An argument could be made for using both mock unit 
@@ -80,38 +81,55 @@ the test database and the additional time taken for these tests to run.
 What I Would Change With More Time
 ----------------------------------
 
-TODO
+The following is a brief list of things that I would have liked to implement given more time, in no particular order:
 
-* UI instead of command line
-* Better handling of the DB with connection pools, transactions and so forth
-* Some kind of clever way of predicting the values of unknowns
-	* Looking at the %age yes for each question and factoring that in for the unknown value?
-	* Asking additional questions that could determine the answer to the original question 
-	* Using answers to other questions to gauge the chance of the unknown being true or false e.g. smokers more likely 
-	to have high blood pressure
-* Investigate generifying the services a bit more (seems to be a fair amount of overlap)
-* E-mails or passwords for patients
-* Simplified queries, using views, etc
-* Services should actually be DAO's
-* All business logic in services (non query methods) should stay in services
-* Interfaces between services and daos for database agnostic code + same with services
-* Validation of user input for names
-* CMS / interactive mode
-* Cassandra and redis for answers
-* Integration tests for all queries
+* A simple user interface for taking the questionnaire as opposed to the command line would have been nice, either as 
+a desktop or web application.
 
-As mentioned in the overview of the solution, testing database methods requires a separate test database to be 
+* Better handling of the database with connection pools and transactions, this would then allow any code requiring the 
+database to use a with statement for automatic handling of commits and the closing of connections.
+
+* A better way of handling unknown values when calculating the eligibility chance, as described in the overview of the solution.
+
+* Investigate making the services a bit more generic as there seems to be a fair amount of cross cutting concerns. It 
+may also have been beneficial to use an ORM such as SQLAlchemy to remove the need for raw SQL and data mappers, 
+however introducing an ORM brings a set of its own problems not necessarily worth the trade off.
+
+* Patients should have to verify their identity when beginning the questionnaire using an e-mail or password to prevent 
+anyone using their identity in subsequent sessions.
+
+* Complex queries could have been improved by creating a view to query from.
+
+* To improve architectural correctness, each service as it is now should actually be a DAO (data access object) 
+responsible for direct interaction with the database. Each DAO should have an interface allowing it to be 
+interchanged for a DAO of different implementation whilst still providing the same functionality, useful for instance
+if data is to be provided from two different sources such as Amazon SDB and MySQL. The data retrieved by the DAOs should 
+then by handed to a mapper class responsible for creating the Python objects from the data. Finally all remaining 
+business logic should stay as a service, with additional methods exposing the operations provided by the DAOs along with 
+any glue code that may be required. As with the DAOs, services should also have interfaces allowing for the 
+interoperability of multiple implementations.
+
+* User input should be validated when entering a name; currently non-alphabetic characters can be entered and it's 
+likely to break if a name is too long. 
+
+* A content management system or interactive mode would be useful for managing the entries in the database in a more 
+usable manor, as well as for providing useful metrics. 
+
+* Using a MySQL database does not scale effectively for large data sets with high throughput. As such it may be more 
+effective to use an in-memory database such as Redis to temporarily record live answers from patients taking the 
+questionnaire and then commit them to a database designed to store larger data sets such as Cassandra. 
+
+* Integration tests for all methods interacting with the database.
+
+* I had to convert the given csv data file into unix format from Windows as the Python CSV library was not playing nicely 
+with Windows line endings on my Mac; I tried using an answer from StackOverflow[0] to fix this however that resulted in 
+the values not being separated at all (basically the CSV library doing nothing!).
+
+* As mentioned in the overview of the solution, integration testing requires a separate test database to be 
 pre-configured. This should be done a bit smarter either by using an existing library or framework to take care of it 
 or at least creating and destroying the database at the start and end of testing. 
 
-Limitations
------------
-
-I had to convert the given csv data file into unix format from Windows as the Python CSV library was not playing nicely 
-with Windows line endings on my Mac; I tried using an answer from StackOverflow[0] to fix this however that resulted in 
-the values not being separated at all (basically the CSV library doing nothing!).
-	
-Patients do not enter any kind of uniquely identifiable information e.g. an e-mail or password. This means that when 
+* Patients do not enter any kind of uniquely identifiable information e.g. an e-mail or password. This means that when 
 a patient reuses the system they could enter any name of a previous patient and assume their identity. It also means 
 patients with the same name would end up sharing session histories. 
 
@@ -175,4 +193,3 @@ TODO List
 
 * Test setup.py
 * Test questionnaire mode
-* Test initial eligibility chance is correct
