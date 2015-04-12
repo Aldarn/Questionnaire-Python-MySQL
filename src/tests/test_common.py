@@ -1,6 +1,7 @@
 #!/usr/bin/python2.7
 
 import unittest
+import common
 from ..core.common import *
 from ..core.domain.answer import Answer
 
@@ -37,6 +38,8 @@ class TestCommon(unittest.TestCase):
 		# -------------------------------------------------------
 		self.assertEqual(result, 'y')
 
+	# TODO: Test empty user input
+
 	def _optionsInputFunction(self, prompt, _hasPrompted = [False]):
 		if _hasPrompted[0]:
 			_hasPrompted[0] = True
@@ -45,17 +48,14 @@ class TestCommon(unittest.TestCase):
 			return 'y'
 
 	def testIsEligibleIsEligible(self):
-		answers = [Answer(i, i, 'F') for i in range(0, 5)]
 		# -------------------------------------------------------
-		eligible = isEligible(answers)
+		eligible = isEligible(common.getTestAnswers(possibleAnswers = 'F'))
 		# -------------------------------------------------------
 		self.assertTrue(eligible)
 
 	def testIsEligibleNotEligible(self):
-		possibleAnswers = ['T', 'F', 'U']
-		answers = [Answer(i, i, possibleAnswers[i % len(possibleAnswers)]) for i in range(0, 5)]
 		# -------------------------------------------------------
-		eligible = isEligible(answers)
+		eligible = isEligible(common.getTestAnswers())
 		# -------------------------------------------------------
 		self.assertFalse(eligible)
 
