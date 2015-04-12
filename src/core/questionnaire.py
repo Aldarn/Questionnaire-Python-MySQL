@@ -22,6 +22,10 @@ class Questionnaire(object):
 		# Get the patient
 		patient = patientService.createOrGetFromInput()
 
+		# Indicate how many times they have done this before
+		print "\nGood to see you, %s. You have completed this questionnaire %i times before." \
+			  % (patient.name, len(sessionService.getPatientSessions(patient.id)))
+
 		# Create a new session
 		session = sessionService.create(Session(patient.id))
 
@@ -31,10 +35,10 @@ class Questionnaire(object):
 		# Ask each question and record the answers
 		answers = []
 		for question in questions:
-			print "Your current eligibility chance is %i%%\n" % patientService.getEligibleChance(session.id, answers)
+			print "\nYour current eligibility chance is %i%%\n" % patientService.getEligibleChance(session.id, answers)
 
 			# TODO: Encapsulate this in the question service, use user friendly names and map the results
-			answer = getUserInput("%s  " % question.question, ["T", "F", "U"])
+			answer = getUserInput("%s " % question.question, ["T", "F", "U"]).upper()
 
 			# Save the answer
 			answer = Answer(question.id, session.id, answer)
