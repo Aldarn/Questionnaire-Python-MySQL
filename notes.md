@@ -135,7 +135,10 @@ patients with the same name would end up sharing session histories.
 
 * There are currently no command line arguments; improved functionality may have been possible with additional options.
 
-	[0] http://stackoverflow.com/questions/17315635/csv-new-line-character-seen-in-unquoted-field-error
+* The Questionnaire run method needs better testing than the simple unit test currently in place, however I ran out of 
+time before being able to improve this.
+
+		[0] http://stackoverflow.com/questions/17315635/csv-new-line-character-seen-in-unquoted-field-error
 
 getEligibleCount Benchmarking
 -----------------------------
