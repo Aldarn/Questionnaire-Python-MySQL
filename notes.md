@@ -133,6 +133,8 @@ or at least creating and destroying the database at the start and end of testing
 a patient reuses the system they could enter any name of a previous patient and assume their identity. It also means 
 patients with the same name would end up sharing session histories. 
 
+* There are currently no command line arguments; improved functionality may have been possible with additional options.
+
 	[0] http://stackoverflow.com/questions/17315635/csv-new-line-character-seen-in-unquoted-field-error
 
 getEligibleCount Benchmarking
@@ -187,9 +189,3 @@ a collection of 102 sessions for reference:
 		ON sessions1.patient_id = sessions2.patient_id 
 		AND sessions1.created = sessions2.maxCreated 
 		AND sessions1.eligible = 1
-
-TODO List
----------
-
-* Test setup.py
-* Test questionnaire mode
