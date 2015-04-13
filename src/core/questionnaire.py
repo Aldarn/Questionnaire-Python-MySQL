@@ -39,7 +39,7 @@ class Questionnaire(object):
 		for question in questions:
 			print "\nYour current eligibility chance is %i%%\n" % patientService.getEligibleChance(session.id, answers)
 
-			answer = getUserInput("%s " % question.question, answerService.getFriendlyAnswers()).upper()
+			answer = getUserInput("%s " % question.question, map(str.title, answerService.getFriendlyAnswers()))
 
 			# Save the answer
 			answer = Answer(question.id, session.id, answerService.getAnswerFromFriendly(answer))

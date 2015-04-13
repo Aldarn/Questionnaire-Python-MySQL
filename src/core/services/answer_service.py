@@ -3,7 +3,7 @@ from ..domain.answer import Answer
 
 class AnswerService(Service):
 
-	ACCEPTABLE_ANSWERS = {"Yes": "T", "No": "F", "Skip": "U"}
+	ACCEPTABLE_ANSWERS = {"yes": "T", "no": "F", "skip": "U"}
 
 	def __init__(self):
 		super(AnswerService, self).__init__()
@@ -43,7 +43,7 @@ class AnswerService(Service):
 		:param friendly: The user friendly name.
 		:return: The internal value.
 		"""
-		return AnswerService.ACCEPTABLE_ANSWERS[friendly]
+		return AnswerService.ACCEPTABLE_ANSWERS[friendly.lower()]
 
 	def _map(self, answerResult):
 		return Answer(answerResult["question_id"], answerResult["session_id"], answerResult["answer"])
