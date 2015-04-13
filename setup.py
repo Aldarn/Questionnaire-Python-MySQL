@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+
 from setuptools import setup
 
 setup(
@@ -8,12 +10,12 @@ setup(
     url              = 'https://bitbucket.org/Aldarn/questionnaire',
     download_url     = 'https://bitbucket.org/Aldarn/questionnaire/downloads',
     description      = 'Simple MySQL driven command line questionnaire with per-question percentage chance of acceptance.',
-    py_modules       = ['Questionnaire'],
+    py_modules       = ['launch_questionnaire'],
     package_dir      = {'': 'src'},
     license          = 'GPLv3+',
     long_description = open( "readme.md" ).read(),
 	install_requires = ['MySQL-python', 'fake-factory'],
-	test_requires 	 = ['mock'],
+	tests_require 	 = ['mock'],
     classifiers 	 = [
         'Environment :: Console',
 		'Intended Audience :: End Users/Desktop',
