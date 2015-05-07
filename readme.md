@@ -46,6 +46,7 @@ Running the Questionnaire
 5. Populate the database using the ingest data script by running the following from a command line interface:
 
 		./src/scripts/ingest_data.py
+
 6. Execute the following from a command line interface from the project base directory:
 
 		./src/launch_questionnaire.py
