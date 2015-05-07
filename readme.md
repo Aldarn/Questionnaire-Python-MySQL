@@ -43,7 +43,10 @@ Running the Questionnaire
 2. Create two databases, `questionnaire` and `questionnaire_test`.
 3. Run the SQL file in the sql directory against both databases to create the initial table structure.
 4. Update the `_connect` method in `src/core/db.py` to use your MySQL credentials.
-5. Execute the following from a command line interface from the project base directory:
+5. Populate the database using the ingest data script by running the following from a command line interface:
+
+		./src/scripts/ingest_data.py
+6. Execute the following from a command line interface from the project base directory:
 
 		./src/launch_questionnaire.py
 
